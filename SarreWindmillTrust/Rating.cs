@@ -7,6 +7,9 @@ namespace SarreWindmillTrust
     {
         public string Rank { get; private set; }
         public static readonly object[] Rankings = { "Bronze", "Silver", "Gold", "Diamond", "Platinum" };
+        private static readonly uint[] RatingMilestones = {5, 10, 25, 50};
+        private static readonly DateTime EarlyDonorDate = new DateTime(2010, 01, 01);
+
 
         public Rating()
         {
@@ -15,6 +18,7 @@ namespace SarreWindmillTrust
 
         public void CalculateRating(List<Donation> donations)
         {
+            if (donations == null) throw new ArgumentNullException(nameof(donations));
             uint currentRating = 1;
             decimal totalDonations = 0;
             Donation lastDonation = null;
@@ -25,8 +29,7 @@ namespace SarreWindmillTrust
 
                 if (firstDonation)
                 {
-                    DateTime earlyDonorDate = new DateTime(2010, 01, 01);
-                    if (donation.Date < earlyDonorDate)
+                    if (donation.Date < EarlyDonorDate)
                     {
                         currentRating += 2;
                     }
@@ -62,10 +65,11 @@ namespace SarreWindmillTrust
                 currentRating += (uint)total;
             }
 
-            if (currentRating > 5)  Rank = (string)Rankings[1];
-            if (currentRating > 10) Rank = (string)Rankings[2];
-            if (currentRating > 25) Rank = (string)Rankings[3];
-            if (currentRating > 50) Rank = (string)Rankings[4];
+            if (currentRating > RatingMilestones[0]) Rank = (string)Rankings[1];
+            if (currentRating > RatingMilestones[1]) Rank = (string)Rankings[2];
+            if (currentRating > RatingMilestones[2]) Rank = (string)Rankings[3];
+            if (currentRating > RatingMilestones[3]) Rank = (string)Rankings[4];
+            Console.WriteLine(currentRating);
         }
 
     }

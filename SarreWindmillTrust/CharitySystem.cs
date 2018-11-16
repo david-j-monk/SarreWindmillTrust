@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace SarreWindmillTrust
 {
-    class CharitySystem
+    public class CharitySystem
     {
         private readonly List<Donor> donors;
         public Donor CurrentDonor { get; private set; }
@@ -30,6 +30,7 @@ namespace SarreWindmillTrust
         public void AddDonation(decimal donation, DateTime date)
         {
             CurrentDonor.AddNewDonation(donation, date);
+            CurrentDonor.JoinSameDayDonations();
             CurrentDonor.SortDonations();
             CurrentDonor.CalculateRating();
             CurrentDonor.UpdateDonorMembers();
@@ -57,7 +58,6 @@ namespace SarreWindmillTrust
             {
                 success = uId == CurrentDonor.UID && name == CurrentDonor.Name;
             }
-
             return success;
         }
 
@@ -69,7 +69,6 @@ namespace SarreWindmillTrust
         
         public List<string> CreateListOfChosenRanks(int index)
         {
-
             List<string> listOfDonorsOfChosenRank = new List<string>();
             foreach (Donor donor in donors)
             {
@@ -81,7 +80,6 @@ namespace SarreWindmillTrust
                     }
                 }
             }
-
             return listOfDonorsOfChosenRank;
         }
     }

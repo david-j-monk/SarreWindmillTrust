@@ -24,16 +24,72 @@ namespace SarreWindmillTrust
         }
 
 
+        #region Event Handlers
+
         private void uiLoginButton_Click(object sender, EventArgs e)
         {
             Login();
-
         }
 
         private void uiDonateButton_Click(object sender, EventArgs e)
         {
             if (ValidateUserInputs()) ProcessDonation();
         }
+
+        private void uiClearDonorDetailsButton_Click(object sender, EventArgs e)
+        {
+            ClearTextBoxes();
+            ClearUIDonorDetails();
+        }
+
+        private void uiDonorIDTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (uiDonorIDTextBox.Text.Length > 0)
+            {
+                ClearUIDonorDetails();
+            }
+        }
+
+        private void uiDonorNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            uiDonorNameTextBox.Text = Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(uiDonorNameTextBox.Text);
+            uiDonorNameTextBox.Select(uiDonorNameTextBox.TextLength, 0);
+            if (uiDonorNameTextBox.Text.Length > 0)
+            {
+                ClearUIDonorDetails();
+            }
+        }
+
+        private void uiDonorIDTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+            Login();
+            e.SuppressKeyPress = true;
+        }
+
+        private void uiAmountTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+            if (ValidateUserInputs()) ProcessDonation();
+            e.SuppressKeyPress = true;
+        }
+
+        private void uiDatePicker_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+            if (ValidateUserInputs()) ProcessDonation();
+            e.SuppressKeyPress = true;
+        }
+
+        private void uiSelectRatingDropdown_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            DisplayRankingResults();
+        }
+
+        #endregion
+
+
+        #region Methods
 
         private void Login()
         {
@@ -54,8 +110,8 @@ namespace SarreWindmillTrust
 
         private void ProcessDonation()
         {
-            string textToShowOnMessageBox = charitySystem.CurrentDonor == null 
-                ? $"Add {name} as a new donor and \nrecord {amount:C} as their first donation" 
+            string textToShowOnMessageBox = charitySystem.CurrentDonor == null
+                ? $"Add {name} as a new donor and \nrecord {amount:C} as their first donation"
                 : $"Register donation of {amount:C} from {name}? ";
 
             DialogResult dialogResult = MessageBox.Show(textToShowOnMessageBox,
@@ -134,7 +190,7 @@ namespace SarreWindmillTrust
                 uiAmountTextBox.Select();
                 success = false;
             }
-            
+
             else if (!decimal.TryParse(string.Format($"{amountDecimal:0.##}"), out amount) || amount < .01M)
             {
                 ShowToolTip(uiAmountTextBox, "Please enter a valid donation amount");
@@ -166,15 +222,13 @@ namespace SarreWindmillTrust
             return success;
         }
 
-
         private bool ValidateUserInputs()
         {
             string tempUID = uiDonorIDTextBox.Text;
             string tempName = uiDonorNameTextBox.Text;
             string tempAmount = uiAmountTextBox.Text;
             date = uiDatePicker.Value;
-
-
+            
             if (!CheckIDValidity(tempUID)) return false;
             if (!CheckNameValidity(tempName)) return false;
             if (!CheckAmountValidity(tempAmount)) return false;
@@ -190,14 +244,6 @@ namespace SarreWindmillTrust
                                                      $" on {charitySystem.CurrentDonor.DateOfLastDonation:d}");
             uiRatingLabel.Text = charitySystem.CurrentDonor.Rating.Rank;
             DisplayRankingResults();
-
-
-        }
-
-        private void uiSelectRatingDropdown_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            DisplayRankingResults();
-
         }
 
         private void ClearTextBoxes()
@@ -208,8 +254,6 @@ namespace SarreWindmillTrust
             uiDatePicker.Value = DateTime.Today;
         }
 
-
-
         private void ClearUIDonorDetails()
         {
             uiTotalDonationsLabel.Text = "";
@@ -219,18 +263,10 @@ namespace SarreWindmillTrust
             uiRatingLabel.Text = "";
         }
 
-        private void ShowToolTip(TextBox textBox, string textToDisplay)
+        private static void ShowToolTip(IWin32Window textBox, string textToDisplay)
         {
             ToolTip toolTip = new ToolTip();
             toolTip.Show(textToDisplay, textBox, 65, -23, 2500);
-        }
-
-        private void uiDonorNameTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-            uiDonorNameTextBox.Text = Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(uiDonorNameTextBox.Text);
-            uiDonorNameTextBox.Select(uiDonorNameTextBox.TextLength, 0);
-
         }
 
         private void DisplayRankingResults()
@@ -241,47 +277,6 @@ namespace SarreWindmillTrust
                 uiRatingsListBox.Items.Add(chosenRank);
             }
         }
-
-        private void uiClearDonorDetailsButton_Click(object sender, EventArgs e)
-        {
-            ClearUIDonorDetails();
-        }
-
-        private void uiDonorIDTextBox_TextChanged(object sender, EventArgs e)
-        {
-            if (uiDonorIDTextBox.Text.Length > 0)
-            {
-                ClearUIDonorDetails();
-            }
-        }
-
-
-
-        private void uiDonorIDTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                Login();
-                e.SuppressKeyPress = true;
-            }
-        }
-
-        private void uiAmountTextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (ValidateUserInputs()) ProcessDonation();
-                e.SuppressKeyPress = true;
-            }
-        }
-
-        private void uiDatePicker_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (ValidateUserInputs()) ProcessDonation();
-                e.SuppressKeyPress = true;
-            }
-        }
+        #endregion
     }
 }
